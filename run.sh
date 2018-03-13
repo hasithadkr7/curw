@@ -10,4 +10,12 @@ cd /home/hec-dssvue201
 ./hec-dssvue.sh &
 #echo "hec-dssvue is running..."
 cd /home
+
+export AIRFLOW_HOME=/home/airflow
+#mkdir /home/airflow/dags
+
+echo "Starting Airflow Webserver"
+airflow initdb
+sleep 5
+exec airflow webserver -p 8080 &
 /bin/bash

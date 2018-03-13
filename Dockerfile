@@ -82,9 +82,19 @@ RUN rm -f /home/hec-dssvue201/jar/sys/jythonlib.jar
 RUN mv /usr/share/jython/jythonlib.jar /home/hec-dssvue201/jar/sys
 
 RUN yum -y install glibc-devel
+RUN yum -y install net-tools
 #----------------------------------End install hec-dssvue-----------------------------------------
 
 WORKDIR /home
+
+RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+RUN python get-pip.py
+RUN yum -y install python-devel
+RUN yum -y install gcc
+RUN pip install apache-airflow
+
+COPY hello.py /home/airflow/dags/hello.py
+
 ENTRYPOINT ["./run.sh"]
 
 
