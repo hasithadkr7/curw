@@ -16,7 +16,7 @@ RUN yum -y install \
  libXtst.i686 \
  libgcc.i686 \
  libstdc++.i686 \
- xorg-x11-server-Xvfb
+ xorg-x11-server-Xvfb 
 
 # Download hec-hms421-linux.tar.gz
 RUN wget 'http://www.hec.usace.army.mil/software/hec-hms/downloads/hec-hms421-linux.tar.gz'
@@ -27,26 +27,10 @@ RUN tar -xvzf hec-hms421-linux.tar.gz
 #Remove tar file
 RUN rm -f hec-hms421-linux.tar.gz
 
-# Start Xvbf
-#WORKDIR /usr/bin/Xvfb
-#RUN Xvfb :1 -screen 0 1152x900x8 &
-#RUN Xvfb :1 -screen 0 800x600x16 &
-
-# Goto intallation directly
-#WORKDIR /home/hec-hms-421
-
-#Start hec-hms
-#RUN ./hec-hms.sh &
-ENV DISPLAY :1.0
 COPY run.sh /home/run.sh
 
 RUN chmod a+x /home/run.sh
 
-#Bring this to last
-#ENTRYPOINT ["./run.sh"]
-
-#-------------------------------------End install hec-hms------------------------------------------
-#---------------------------------Start install hec-dssvue-----------------------------------------
 WORKDIR /home
 
 #install java for jython
@@ -81,20 +65,18 @@ RUN rm -f hec-dssvue201.bin
 RUN rm -f /home/hec-dssvue201/jar/sys/jythonlib.jar 
 RUN mv /usr/share/jython/jythonlib.jar /home/hec-dssvue201/jar/sys
 
-RUN yum -y install glibc-devel
-RUN yum -y install net-tools
-#----------------------------------End install hec-dssvue-----------------------------------------
-
 WORKDIR /home
 
-RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
-RUN python get-pip.py
-RUN yum -y install python-devel
-RUN yum -y install gcc
+RUN yum -y --enablerepo=extras install epel-release
+RUN yum -y install \
+ glibc-devel \
+ net-tools \
+ python-pip \
+ python-devel \
+ gcc
+
 RUN pip install apache-airflow
 
 COPY hello.py /home/airflow/dags/hello.py
 
 ENTRYPOINT ["./run.sh"]
-
-
