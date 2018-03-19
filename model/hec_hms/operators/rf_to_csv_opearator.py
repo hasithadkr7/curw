@@ -4,7 +4,7 @@ Created on Mar 15, 2018
 '''
 
 from airflow.models import BaseOperator
-from datetime import datetime
+from datetime import datetime, timedelta, time
 from ordereddict import OrderedDict
 import glob
 import csv
@@ -18,14 +18,19 @@ class RfToCsvOperator(BaseOperator):
     def execute(self, context):
         rf_forecasted_days = 0
         rain_csv_file = 'DailyRain.csv'
-        rf_dir_path = './WRF/RF/'
-        kub_dir_path = './WRF/kelani-upper-basin'
+        rf_dir_path = './INPUT/rf'
+        kub_dir_path = './INPUT/kub'
         output_dir = './OUTPUT'
         print 'executing {}'.__str__()
         rf_to_csv_convert(rf_forecasted_days, rain_csv_file, rf_dir_path, kub_dir_path, output_dir)
 
 
-def rf_to_csv_convert(rf_forecasted_days, rain_csv_file, rf_dir_path, kub_dir_path, output_dir):
+def rf_to_csv_convert():
+    rf_forecasted_days = 0
+    rain_csv_file = 'DailyRain.csv'
+    rf_dir_path = './INPUT/rf'
+    kub_dir_path = './INPUT/kub'
+    output_dir = './OUTPUT'
     date = ''
     time = ''
     start_date = ''
@@ -53,7 +58,7 @@ def rf_to_csv_convert(rf_forecasted_days, rain_csv_file, rf_dir_path, kub_dir_pa
     kelani_upper_basin = kelani_upper_basin_weights.keys()
 
     # Default run for current day
-    model_state = datetime.datetime.now()
+    model_state = datetime.datetime.now() - timedelta(days=9)
     if date:
         model_state = datetime.datetime.strptime(date, '%Y-%m-%d')
     date = model_state.strftime("%Y-%m-%d")
@@ -86,7 +91,7 @@ def rf_to_csv_convert(rf_forecasted_days, rain_csv_file, rf_dir_path, kub_dir_pa
             csv_catchment = csv.reader(open(filename, 'r'), delimiter=' ', skipinitialspace=True)
             csv_catchment = list(csv_catchment)
             for row in csv_catchment:
-                d = datetime.datetime.strptime(row[0].replace('_', ' '), '%Y-%m-%d %H:%M:%S')
+                d = datetime.strftime(row[0].replace('_', ' '), '%Y-%m-%d %H:%M:%S')
                 key = d.timestamp()
                 if key not in upper_theissen_values:
                     upper_theissen_values[key] = 0

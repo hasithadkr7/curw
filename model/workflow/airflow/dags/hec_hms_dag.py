@@ -5,6 +5,9 @@ Created on Mar 15, 2018
 
 from datetime import datetime, timedelta
 from airflow import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from model.hec_hms.operators.rf_to_csv_opearator import RfToCsvOperator
+
 
 # each Workflow/DAG must have a unique text identifier
 WORKFLOW_DAG_ID = 'hec_hms_workflow_dag'
@@ -36,3 +39,18 @@ dag = DAG(
     schedule_interval=WORKFLOW_SCHEDULE_INTERVAL,
     default_args=WORKFLOW_DEFAULT_ARGS,
 )
+
+
+########################
+# Instantiating Tasks  #
+########################
+
+rf_to_csv_convert = RfToCsvOperator(
+    task_id='rf_to_csv_convert',
+    dag=dag)
+
+dummy_start = DummyOperator(
+    task_id='dummy_start',
+    dag=dag)
+
+dummy_start >> rf_to_csv_convert
