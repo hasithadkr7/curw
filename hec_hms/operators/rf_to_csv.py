@@ -61,7 +61,7 @@ def rf_to_csv_convert():
     LOWER_CATCHMENTS = LOWER_CATCHMENT_WEIGHTS.keys()
 
     # Default run for current day
-    modelState = datetime.now()-timedelta(days=9)
+    modelState = datetime.now()-timedelta(days=10)
     #print(modelState)
     if date:
         modelState = datetime.strptime(date, '%Y-%m-%d')

@@ -80,13 +80,14 @@ RUN yum -y install \
 
 RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN python3.6 get-pip.py
-
+RUN yum -y install build-dep python-psycopg2
+RUN pip install psycopg2 
 RUN pip install apache-airflow
 
 COPY airflow.cfg /home/airflow/airflow.cfg
-#COPY workflow/hec_hms_dag.py /home/airflow/dags/hec_hms_dag.py
+COPY workflow/airflow/dags/hec_hms.py /home/airflow/dags/hec_hms.py
 #COPY RFTOCSV.py /home/RFTOCSV.py
-COPY workflow/model /home/airflow/dags/model
+COPY hec_hms /home/airflow/dags/hec_hms
 COPY INPUT /home/INPUT
 
 ENTRYPOINT ["./run.sh"]
