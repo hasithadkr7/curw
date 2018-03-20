@@ -4,15 +4,15 @@ Created on Mar 15, 2018
 '''
 
 from airflow.models import BaseOperator
-from datetime import datetime, timedelta, time
-
+from datetime import datetime, timedelta
+from airflow.utils import logging
 from airflow.utils.decorators import apply_defaults
 from ordereddict import OrderedDict
 import glob
 import csv
 import os
 
-from model.workflow.airflow.dags.hec_hms import log
+log = logging.getLogger(__name__)
 
 
 class RfToCsvOperator(BaseOperator):

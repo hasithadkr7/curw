@@ -10,5 +10,5 @@ setup(
     author='hasitha dhananjaya',
     author_email='hasitha.10@cse.mrt.ac.lk',
     description='',
-    requires=['airflow', 'pyyaml', 'shapely']
+    requires=['airflow', 'pyyaml', 'shapely','ordereddict']
 )
