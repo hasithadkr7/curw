@@ -1,29 +1,27 @@
 import csv
 from datetime import datetime, timedelta
-import getopt
 import glob
 import os
-import sys
-import traceback
 from collections import OrderedDict
 
 
 def usage():
     usage_text = """
-Usage: ./CSVTODAT.py [-d YYYY-MM-DD] [-t HH:MM:SS] [-h]
-
--h  --help          Show usage
--d  --date          Date in YYYY-MM-DD. Default is current date.
--t  --time          Time in HH:MM:SS. Default is current time.
-    --start-date    Start date of timeseries which need to run the forecast in YYYY-MM-DD format. Default is same as -d(date).
-    --start-time    Start time of timeseries which need to run the forecast in HH:MM:SS format. Default is same as -t(date).
--T  --tag           Tag to differential simultaneous Forecast Runs E.g. wrf1, wrf2 ...
-    --wrf-rf        Path of WRF Rf(Rainfall) Directory. Otherwise using the `RF_DIR_PATH` from CONFIG.json
-    --wrf-kub       Path of WRF kelani-upper-basin(KUB) Directory. Otherwise using the `KUB_DIR_PATH` from CONFIG.json
-"""
+    Usage: ./CSVTODAT.py [-d YYYY-MM-DD] [-t HH:MM:SS] [-h]
+    
+    -h  --help          Show usage
+    -d  --date          Date in YYYY-MM-DD. Default is current date.
+    -t  --time          Time in HH:MM:SS. Default is current time.
+        --start-date    Start date of timeseries which need to run the forecast in YYYY-MM-DD format. Default is same as -d(date).
+        --start-time    Start time of timeseries which need to run the forecast in HH:MM:SS format. Default is same as -t(date).
+    -T  --tag           Tag to differential simultaneous Forecast Runs E.g. wrf1, wrf2 ...
+        --wrf-rf        Path of WRF Rf(Rainfall) Directory. Otherwise using the `RF_DIR_PATH` from CONFIG.json
+        --wrf-kub       Path of WRF kelani-upper-basin(KUB) Directory. Otherwise using the `KUB_DIR_PATH` from CONFIG.json
+    """
     print(usage_text)
 
-try:
+
+def rf_to_csv_convert():
     RF_FORECASTED_DAYS = 0
     RAIN_CSV_FILE = 'DailyRain.csv'
     RF_DIR_PATH = './INPUT/rf'
@@ -38,35 +36,9 @@ try:
 
     date = ''
     time = ''
-    startDate = ''
+    startDate = '2018-03-10'
     startTime = ''
     tag = ''
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:t:T:", [
-            "help", "date=", "time=", "start-date=", "start-time=", "wrf-rf=", "wrf-kub=", "tag="
-        ])
-    except getopt.GetoptError:
-        usage()
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            usage()
-            sys.exit()
-        elif opt in ("-d", "--date"):
-            date = arg
-        elif opt in ("-t", "--time"):
-            time = arg
-        elif opt in ("--start-date"):
-            startDate = arg
-        elif opt in ("--start-time"):
-            startTime = arg
-        elif opt in ("--wrf-rf"):
-            RF_DIR_PATH = arg
-        elif opt in ("--wrf-kub"):
-            KUB_DIR_PATH = arg
-        elif opt in ("-T", "--tag"):
-            tag = arg
-
     UPPER_CATCHMENT_WEIGHTS = {
         # 'Attanagalla'   : 1/7,    # 1
         'Daraniyagala': 0.146828,  # 2
@@ -131,10 +103,7 @@ try:
             #print('csvcatchment:',csvcatchment)
             for row in csvcatchment:
                 DateTimeStr = row[0].replace('_', ' ')
-                ValueStr = row[1].strip(' \t')
                 d = datetime.strptime(DateTimeStr, '%Y-%m-%d %H:%M:%S')
-                #print('d:',d)
-                #Key = time.mktime(d.timetuple())
                 key = d.timestamp()
                 #print('key:',key)
                 if key not in UPPER_THEISSEN_VALUES:
@@ -211,11 +180,4 @@ try:
         d = datetime.fromtimestamp(avg)
         csvWriter.writerow([d.strftime('%Y-%m-%d %H:%M:%S'), "%.2f" % KELANI_UPPER_BASIN_VALUES[avg],
                                 "%.2f" % LOWER_THEISSEN_VALUES[avg]])
-
-except ValueError:
-    raise ValueError("Incorrect data format, should be YYYY-MM-DD")
-except Exception as e:
-    print(e)
-    traceback.print_exc()
-finally:
     print('Completed ', RF_DIR_PATH, ' to ', RAIN_CSV_FILE_PATH)

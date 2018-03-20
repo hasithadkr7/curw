@@ -71,12 +71,23 @@ RUN yum -y --enablerepo=extras install epel-release
 RUN yum -y install \
  glibc-devel \
  net-tools \
- python-pip \
- python-devel \
  gcc
+
+RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+RUN yum -y install \
+ python36u \
+ python36u-devel
+
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python3.6 get-pip.py
 
 RUN pip install apache-airflow
 
-COPY hello.py /home/airflow/dags/hello.py
+COPY airflow.cfg /home/airflow/airflow.cfg
+#COPY workflow/hec_hms_dag.py /home/airflow/dags/hec_hms_dag.py
+#COPY RFTOCSV.py /home/RFTOCSV.py
+COPY workflow/model /home/airflow/dags/model
+COPY INPUT /home/INPUT
 
 ENTRYPOINT ["./run.sh"]
+

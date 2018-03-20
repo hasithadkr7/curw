@@ -6,14 +6,14 @@ Created on Mar 15, 2018
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
-from model.hec_hms.operators.rf_to_csv_opearator import RfToCsvOperator
-
+from model.hec_hms.operators import rf_to_csv as rf_to_csv_converter
+from airflow.operators.python_operator import PythonOperator
 
 # each Workflow/DAG must have a unique text identifier
 WORKFLOW_DAG_ID = 'hec_hms_workflow_dag'
 
 # start/end times are datetime objects
-WORKFLOW_START_DATE = datetime(2018, 3, 14)
+WORKFLOW_START_DATE = datetime(2018, 3, 19)
 
 # schedule/retry intervals are timedelta objects
 # here we execute the DAGs tasks every day
@@ -45,8 +45,13 @@ dag = DAG(
 # Instantiating Tasks  #
 ########################
 
-rf_to_csv_convert = RfToCsvOperator(
+# rf_to_csv_convert = RfToCsvOperator(
+#     task_id='rf_to_csv_convert',
+#     dag=dag)
+
+rf_to_csv_convert = PythonOperator(
     task_id='rf_to_csv_convert',
+    python_callable=rf_to_csv_converter.rf_to_csv_convert(),
     dag=dag)
 
 dummy_start = DummyOperator(

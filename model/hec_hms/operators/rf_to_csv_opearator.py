@@ -5,24 +5,35 @@ Created on Mar 15, 2018
 
 from airflow.models import BaseOperator
 from datetime import datetime, timedelta, time
+
+from airflow.utils.decorators import apply_defaults
 from ordereddict import OrderedDict
 import glob
 import csv
 import os
 
+from model.workflow.airflow.dags.hec_hms import log
+
 
 class RfToCsvOperator(BaseOperator):
-    def __init__(self, *args, **kwargs):
+    @apply_defaults
+    def __init__(self, rf_forecasted_days, rain_csv_file, rf_dir_path, kub_dir_path, output_dir, start_date, start_time, tag,  *args, **kwargs):
+        self.rf_forecasted_days = rf_forecasted_days
+        self.rain_csv_file = rain_csv_file
+        self.rf_dir_path = rf_dir_path
+        self.kub_dir_path = kub_dir_path
+        self.output_dir = output_dir
+        self.start_date = start_date
+        self.start_time = start_time
+        self.tag = tag
         super(RfToCsvOperator, self).__init__(*args, **kwargs)
 
     def execute(self, context):
-        rf_forecasted_days = 0
-        rain_csv_file = 'DailyRain.csv'
-        rf_dir_path = './INPUT/rf'
-        kub_dir_path = './INPUT/kub'
-        output_dir = './OUTPUT'
-        print 'executing {}'.__str__()
-        rf_to_csv_convert(rf_forecasted_days, rain_csv_file, rf_dir_path, kub_dir_path, output_dir)
+        log.info("RfToCsvOperator...")
+        log.info('start_date: %s', self.start_date)
+        task_instance = context['task_instance']
+        sensors_minute = task_instance.xcom_pull('sensor_task_id', key='sensors_minute')
+        log.info('Valid minute as determined by sensor: %s', sensors_minute)
 
 
 def rf_to_csv_convert():
